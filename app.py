@@ -9,7 +9,12 @@ class Hat:
   def __init__(self, **balls):
     self.myBalls = balls
     for key in self.myBalls.keys():
-      self.contents.append(key)
+      while self.myBalls[key] > 0:
+        self.contents.append(key)
+        self.myBalls[key] -= 1
+  
+  #def draw(self, numOfBalls):
+
 
 #def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
 
