@@ -4,10 +4,12 @@ import random
 
 class Hat:
   myBalls = []
-  contents = []
 
-  def __init__(self, **balls):
+  def __init__(self, contents=None, **balls):
     self.myBalls = balls
+    if contents is None:
+      contents = []
+    self.contents = contents
     for key in self.myBalls.keys():
       while self.myBalls[key] > 0:
         self.contents.append(key)
@@ -15,12 +17,13 @@ class Hat:
   
   def draw(self, numOfBalls):
     results = []
-    if numOfBalls > len(self.contents):
-      return  self.contents
+    workingContents = copy.copy(self.contents)
+    if numOfBalls > len(workingContents):
+      return  workingContents
     else:
       while numOfBalls > 0:
-        pick = random.randint(0, len(self.contents) - 1)
-        results.append(self.contents.pop(pick))
+        pick = random.randint(0, len(workingContents) - 1)
+        results.append(workingContents.pop(pick))
         numOfBalls -= 1
     return results
 
@@ -32,31 +35,33 @@ def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
       while expected_balls[key] > 0:
         ballsList.append(key)
         expected_balls[key] -= 1
-  print("The balls we're looking for are:", ballsList)
   
-  drawnBalls = hat.draw(num_balls_drawn)
-  print("Balls drawn from the hat were:", drawnBalls)
+  experimentCount = 0
+  experimentMatches = 0
+  while experimentCount < num_experiments:
+    drawnBalls = hat.draw(num_balls_drawn)
+    foundBalls = 0
+    for ball in ballsList:
+      if ball in drawnBalls:
+        drawnBalls.remove(ball)
+        foundBalls += 1
 
-  successCount = 0
-  for ball in ballsList:
-    if ball in drawnBalls:
-      print('Found the {foundBall} ball!'.format(foundBall=ball))
-      drawnBalls.remove(ball)
-      successCount += 1
-  
-  if successCount == len(ballsList):
-    return "All balls matched!"
-  else:
-    return "Not a match."
+    if foundBalls == len(ballsList):
+      experimentMatches += 1
+      experimentCount += 1
+    else:
+      experimentCount += 1
+  return (experimentMatches/experimentCount)
+
 
 
 #random.seed(95)
 hat = Hat(blue=4, red=2, green=6)
+#print("Hat = ", hat.contents)
 probability = experiment(
     hat=hat,
     expected_balls={"blue": 2,
                     "red": 1},
     num_balls_drawn=4,
-    num_experiments=3000)
-#print("Hat = ", hat.contents)
+    num_experiments=1000)
 print("Probability:", probability)
