@@ -5,25 +5,30 @@ import random
 class Hat:
   myBalls = []
 
-  def __init__(self, contents=None, **balls):
+  def __init__(self, contentsStore=None, contents=None, **balls):
     self.myBalls = balls
-    if contents is None:
-      contents = []
-    self.contents = contents
+    if contentsStore is None:
+      contentsStore = []
+    self.contentsStore = contentsStore
     for key in self.myBalls.keys():
       while self.myBalls[key] > 0:
-        self.contents.append(key)
+        self.contentsStore.append(key)
         self.myBalls[key] -= 1
+    if contents is None:
+      contents = []
+    self.contents = copy.copy(self.contentsStore)
   
   def draw(self, numOfBalls):
+    self.contents = copy.copy(self.contentsStore)
     results = []
-    workingContents = copy.copy(self.contents)
-    if numOfBalls > len(workingContents):
-      return  workingContents
+    print("Contents:", self.contents)
+    #workingContents = copy.copy(self.contents)
+    if numOfBalls > len(self.contents):
+      return self.contents
     else:
       while numOfBalls > 0:
-        pick = random.randint(0, len(workingContents) - 1)
-        results.append(workingContents.pop(pick))
+        pick = random.randint(0, len(self.contents) - 1)
+        results.append(self.contents.pop(pick))
         numOfBalls -= 1
     return results
 
@@ -63,5 +68,5 @@ probability = experiment(
     expected_balls={"blue": 2,
                     "red": 1},
     num_balls_drawn=4,
-    num_experiments=1000)
+    num_experiments=10)
 print("Probability:", probability)
